@@ -1,6 +1,18 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  --color-background: #fafaf7;
+  --color-surface: #ffffff;
+  --color-accent: #ff6b35;
+  --color-violet: #7c3aed;
+  --color-ink: #1a1a2e;
+  --color-muted: #6b7280;
+  --color-mint: #34d399;
+  --color-border: #e8e4de;
+
+  --font-family-display: 'Fraunces', serif;
+  --font-family-body: 'DM Sans', sans-serif;
+}
 
 @layer base {
   body {
