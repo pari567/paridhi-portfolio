@@ -217,7 +217,7 @@ export default function Experience() {
       </div>
 
       {/* Timeline */}
-      <div className="px-8 md:px-14 lg:px-20 py-14" style={{ maxWidth: '760px' }}>
+      <div className="px-8 md:px-14 lg:px-20 py-14">
         {entries.map((entry, i) => (
           <ExperienceEntry key={i} entry={entry} index={i} />
         ))}

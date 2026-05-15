@@ -96,15 +96,13 @@ export default function Skills() {
       </div>
 
       {/* Two-column grid */}
-      <div className="px-8 md:px-14 lg:px-20 py-12">
       <div
-        className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-12"
-        style={{ maxWidth: '900px', rowGap: '48px' }}
+        className="px-8 md:px-14 lg:px-20 py-12 grid grid-cols-1 md:grid-cols-2 gap-x-16"
+        style={{ rowGap: '48px' }}
       >
         {groups.map((group, i) => (
           <SkillGroup key={group.label} group={group} index={i} />
         ))}
-      </div>
       </div>
 
     </section>
