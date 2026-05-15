@@ -1,53 +1,12 @@
 @import "tailwindcss";
 
-@theme {
-  --color-background: #fafaf7;
-  --color-surface: #ffffff;
-  --color-accent: #ff6b35;
-  --color-violet: #7c3aed;
-  --color-ink: #1a1a2e;
-  --color-muted: #6b7280;
-  --color-mint: #34d399;
-  --color-border: #e8e4de;
-
-  --font-family-display: 'Fraunces', serif;
-  --font-family-body: 'DM Sans', sans-serif;
+html,
+body {
+  background-color: #faf8f5;
+  color: #1a1814;
+  font-family: 'DM Sans', sans-serif;
 }
 
-@layer base {
-  body {
-    background-color: #fafaf7;
-    color: #1a1a2e;
-    font-family: 'DM Sans', sans-serif;
-    scroll-behavior: smooth;
-    cursor: none;
-  }
+.font-display {
+  font-family: 'Cormorant Garamond', serif;
 }
-
-.cursor-dot {
-  width: 8px;
-  height: 8px;
-  background: #ff6b35;
-  border-radius: 50%;
-  position: fixed;
-  pointer-events: none;
-  z-index: 9999;
-  transform: translate(-50%, -50%);
-}
-
-.cursor-ring {
-  width: 36px;
-  height: 36px;
-  border: 1.5px solid #ff6b35;
-  border-radius: 50%;
-  position: fixed;
-  pointer-events: none;
-  z-index: 9998;
-  transform: translate(-50%, -50%);
-  transition: all 0.15s ease;
-  opacity: 0.5;
-}
-
-::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-track { background: #fafaf7; }
-::-webkit-scrollbar-thumb { background: #e8e4de; border-radius: 2px; }
