@@ -1,6 +1,5 @@
 import Nav from './components/Nav.jsx'
 import Hero from './components/Hero.jsx'
-import About from './components/About.jsx'
 import Work from './components/Work.jsx'
 import Experience from './components/Experience.jsx'
 import AlsoMe from './components/AlsoMe.jsx'
@@ -12,7 +11,6 @@ export default function App() {
     <>
       <Nav />
       <Hero />
-      <About />
       <Work />
       <Experience />
       <AlsoMe />

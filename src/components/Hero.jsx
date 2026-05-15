@@ -144,6 +144,43 @@ export default function Hero() {
             decided.
           </motion.p>
 
+          {/* Personal note */}
+          <motion.p
+            {...fade(0.6)}
+            style={{
+              fontFamily: "'DM Sans', sans-serif",
+              fontSize: '14px',
+              fontStyle: 'italic',
+              color: '#888',
+              marginTop: '16px',
+              maxWidth: '42ch',
+              lineHeight: 1.65,
+            }}
+          >
+            Originally from New Delhi — now based in Vancouver, asking too many questions and thinking that's a feature, not a bug.
+          </motion.p>
+
+          {/* Education */}
+          <motion.div {...fade(0.65)} style={{ marginTop: '12px' }}>
+            <p style={{
+              fontFamily: "'DM Sans', sans-serif",
+              fontSize: '9px',
+              textTransform: 'uppercase',
+              letterSpacing: '0.16em',
+              color: '#c9b99a',
+              marginBottom: '4px',
+            }}>
+              Education
+            </p>
+            <p style={{
+              fontFamily: "'DM Sans', sans-serif",
+              fontSize: '13px',
+              color: '#444',
+            }}>
+              BA, Psychology + Data Science · University of British Columbia · 2026
+            </p>
+          </motion.div>
+
         </div>
 
         {/* Right column — placeholder card */}

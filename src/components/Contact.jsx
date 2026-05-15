@@ -22,7 +22,7 @@ export default function Contact() {
       {/* Section header */}
       <div className="px-8 md:px-14 lg:px-20 pt-20 pb-0">
         <div className="flex items-baseline gap-5 pb-4">
-          <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: '12px', color: '#b0a898' }}>06</span>
+          <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: '12px', color: '#b0a898' }}>05</span>
           <h2
             style={{
               fontFamily: "'Bebas Neue', sans-serif",
