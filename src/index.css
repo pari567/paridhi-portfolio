@@ -5,6 +5,11 @@ body {
   background-color: #faf8f5;
   color: #1a1814;
   font-family: 'DM Sans', sans-serif;
+  scroll-behavior: smooth;
+}
+
+body {
+  padding-top: 56px;
 }
 
 .font-display {
