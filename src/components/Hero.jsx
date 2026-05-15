@@ -93,9 +93,41 @@ export default function Hero() {
             UX Research · Consumer Insights · People &amp; Culture · Program Coordination
           </motion.p>
 
+          {/* Links */}
+          <motion.div {...fade(0.46)} className="flex items-center">
+            {[
+              { label: 'Resume ↗', href: 'https://drive.google.com/file/d/1sZZIhCh4s3RCRS8mvQjY3WGeivfomqu2/view?usp=sharing' },
+              { label: 'LinkedIn ↗', href: 'https://www.linkedin.com/in/paridhibansal' },
+              { label: 'GitHub ↗', href: 'https://github.com/pari567' },
+            ].map(({ label, href }, i) => (
+              <div key={i} className="flex items-center">
+                {i > 0 && (
+                  <span style={{ width: '1px', height: '12px', backgroundColor: '#c9b99a', display: 'inline-block', margin: '0 24px' }} />
+                )}
+                <a
+                  href={href}
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{
+                    fontFamily: "'DM Sans', sans-serif",
+                    fontSize: '12px',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.1em',
+                    color: '#1a1814',
+                    textDecoration: 'none',
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.textDecoration = 'underline' }}
+                  onMouseLeave={e => { e.currentTarget.style.textDecoration = 'none' }}
+                >
+                  {label}
+                </a>
+              </div>
+            ))}
+          </motion.div>
+
           {/* Blurb */}
           <motion.p
-            {...fade(0.46)}
+            {...fade(0.54)}
             style={{
               fontFamily: "'DM Sans', sans-serif",
               fontSize: '15px',
@@ -112,51 +144,6 @@ export default function Hero() {
             decided.
           </motion.p>
 
-          {/* Buttons */}
-          <motion.div {...fade(0.54)} className="flex gap-3 pt-2">
-            <a
-              href="#work"
-              className="group px-6 py-2.5 text-sm tracking-wide transition-colors duration-200"
-              style={{
-                fontFamily: "'DM Sans', sans-serif",
-                border: '1px solid #1a1814',
-                color: '#1a1814',
-                borderRadius: 0,
-              }}
-              onMouseEnter={e => {
-                e.currentTarget.style.backgroundColor = '#1a1814'
-                e.currentTarget.style.color = '#faf8f5'
-              }}
-              onMouseLeave={e => {
-                e.currentTarget.style.backgroundColor = 'transparent'
-                e.currentTarget.style.color = '#1a1814'
-              }}
-            >
-              View Work
-            </a>
-            <a
-              href="https://drive.google.com/file/d/1sZZIhCh4s3RCRS8mvQjY3WGeivfomqu2/view?usp=sharing"
-              target="_blank"
-              rel="noreferrer"
-              className="px-6 py-2.5 text-sm tracking-wide transition-colors duration-200"
-              style={{
-                fontFamily: "'DM Sans', sans-serif",
-                border: '1px solid #1a1814',
-                color: '#1a1814',
-                borderRadius: 0,
-              }}
-              onMouseEnter={e => {
-                e.currentTarget.style.backgroundColor = '#1a1814'
-                e.currentTarget.style.color = '#faf8f5'
-              }}
-              onMouseLeave={e => {
-                e.currentTarget.style.backgroundColor = 'transparent'
-                e.currentTarget.style.color = '#1a1814'
-              }}
-            >
-              Resume ↗
-            </a>
-          </motion.div>
         </div>
 
         {/* Right column — placeholder card */}

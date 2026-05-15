@@ -3,7 +3,8 @@
     "allow": [
       "Bash(npm install *)",
       "Bash(which node *)",
-      "Read(//usr/local/bin/**)"
+      "Read(//usr/local/bin/**)",
+      "Bash(git *)"
     ]
   }
 }
