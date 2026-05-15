@@ -85,7 +85,7 @@ function ExperienceEntry({ entry, index }) {
       transition={{ duration: 0.5, ease: 'easeOut', delay: index * 0.08 }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      style={{ display: 'flex', gap: '32px', position: 'relative' }}
+      style={{ display: 'flex', gap: '48px', position: 'relative' }}
     >
       {/* Timeline column */}
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flexShrink: 0, width: '20px' }}>
@@ -109,15 +109,15 @@ function ExperienceEntry({ entry, index }) {
       <div
         style={{
           flex: 1,
-          paddingBottom: index < entries.length - 1 ? '40px' : '0',
-          paddingLeft: '8px',
+          paddingBottom: index < entries.length - 1 ? '64px' : '0',
+          paddingLeft: '16px',
         }}
       >
         {/* Dates + location */}
         <p
           style={{
             fontFamily: "'DM Sans', sans-serif",
-            fontSize: '11px',
+            fontSize: '12px',
             textTransform: 'uppercase',
             letterSpacing: '0.1em',
             color: '#c9b99a',
@@ -133,7 +133,7 @@ function ExperienceEntry({ entry, index }) {
             style={{
               fontFamily: "'DM Sans', sans-serif",
               fontWeight: 500,
-              fontSize: '14px',
+              fontSize: '17px',
               color: '#1a1814',
             }}
           >
@@ -155,7 +155,7 @@ function ExperienceEntry({ entry, index }) {
           style={{
             fontFamily: "'Cormorant Garamond', serif",
             fontStyle: 'italic',
-            fontSize: '18px',
+            fontSize: '22px',
             color: '#1a1814',
             marginBottom: '14px',
             lineHeight: 1.3,
@@ -171,7 +171,7 @@ function ExperienceEntry({ entry, index }) {
               key={i}
               style={{
                 fontFamily: "'DM Sans', sans-serif",
-                fontSize: '13px',
+                fontSize: '15px',
                 color: '#555',
                 lineHeight: 1.7,
                 paddingLeft: '14px',
