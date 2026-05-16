@@ -2,19 +2,28 @@ import { useRef, useEffect } from 'react'
 import { motion, useMotionValue, useSpring, animate } from 'framer-motion'
 
 function PolaroidCard() {
-  const rawRotation = useMotionValue(0)
+  const rawRotation = useMotionValue(-12)
   const rotation = useSpring(rawRotation, { stiffness: 150, damping: 15 })
 
   const isDragging = useRef(false)
   const startX = useRef(0)
+  const idleControl = useRef(null)
 
-  // Settling swing on mount: start at -8°, overshoot to ~3°, settle to 0°
   useEffect(() => {
-    rawRotation.set(-8)
-    const timer = setTimeout(() => {
-      animate(rawRotation, 0, { type: 'spring', stiffness: 55, damping: 9 })
-    }, 300)
-    return () => clearTimeout(timer)
+    // Entry: -12deg → -3deg over 1.2s, then idle sway
+    const entry = animate(rawRotation, -3, { duration: 1.2, ease: 'easeOut' })
+    entry.then(() => {
+      idleControl.current = animate(rawRotation, [-4, -2], {
+        duration: 3,
+        ease: 'easeInOut',
+        repeat: Infinity,
+        repeatType: 'mirror',
+      })
+    })
+    return () => {
+      entry.stop()
+      idleControl.current?.stop()
+    }
   }, [])
 
   const onPointerDown = (e) => {
@@ -22,6 +31,8 @@ function PolaroidCard() {
     startX.current = e.clientX
     e.currentTarget.setPointerCapture(e.pointerId)
     document.body.style.cursor = 'grabbing'
+    idleControl.current?.stop()
+    idleControl.current = null
   }
 
   const onPointerMove = (e) => {
@@ -34,7 +45,14 @@ function PolaroidCard() {
     if (!isDragging.current) return
     isDragging.current = false
     document.body.style.cursor = ''
-    animate(rawRotation, 0, { type: 'spring', stiffness: 150, damping: 15 })
+    animate(rawRotation, -3, { type: 'spring', stiffness: 150, damping: 15 }).then(() => {
+      idleControl.current = animate(rawRotation, [-4, -2], {
+        duration: 3,
+        ease: 'easeInOut',
+        repeat: Infinity,
+        repeatType: 'mirror',
+      })
+    })
   }
 
   return (
@@ -47,8 +65,11 @@ function PolaroidCard() {
         userSelect: 'none',
       }}
     >
-      {/* Rotating group — transforms around the anchor at top centre */}
+      {/* Entry fade-in + scale, rotation handled by useSpring above */}
       <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 1.2, ease: 'easeOut' }}
         style={{
           display: 'flex',
           flexDirection: 'column',
@@ -58,25 +79,10 @@ function PolaroidCard() {
         }}
       >
         {/* Attachment circle */}
-        <div
-          style={{
-            width: '8px',
-            height: '8px',
-            borderRadius: '50%',
-            backgroundColor: '#c9b99a',
-            flexShrink: 0,
-          }}
-        />
+        <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#c9b99a', flexShrink: 0 }} />
 
         {/* String */}
-        <div
-          style={{
-            width: '1.5px',
-            height: '60px',
-            backgroundColor: '#c9b99a',
-            flexShrink: 0,
-          }}
-        />
+        <div style={{ width: '1.5px', height: '60px', backgroundColor: '#c9b99a', flexShrink: 0 }} />
 
         {/* Bottom circle where string meets card */}
         <div
@@ -174,21 +180,23 @@ const fade = (delay = 0) => ({
 
 export default function Hero() {
   return (
-    <section id="hero" style={{ backgroundColor: '#faf8f5' }} className="flex flex-col">
-
+    <section
+      id="hero"
+      style={{ backgroundColor: '#faf8f5', paddingTop: '80px' }}
+      className="flex flex-col"
+    >
       {/* Top ruled line */}
       <div style={{ borderTop: '1px solid #d4ccc0' }} />
 
-      {/* Name block */}
+      {/* Name block — no bottom border */}
       <motion.div
         {...fade(0.2)}
         className="px-8 md:px-14 lg:px-20 py-3"
-        style={{ borderBottom: '1px solid #d4ccc0' }}
       >
         <h1
           style={{
             fontFamily: "'Bebas Neue', sans-serif",
-            fontSize: 'clamp(80px, 13vw, 140px)',
+            fontSize: 'clamp(48px, 7vw, 96px)',
             letterSpacing: '0.02em',
             lineHeight: 0.92,
             color: '#1a1814',
@@ -199,8 +207,10 @@ export default function Hero() {
       </motion.div>
 
       {/* Body — two columns */}
-      <div className="flex-1 flex" style={{ borderBottom: '1px solid #d4ccc0' }}>
-
+      <div
+        className="flex-1 flex"
+        style={{ borderBottom: '1px solid #d4ccc0', gap: '40px' }}
+      >
         {/* Left column */}
         <div className="flex-1 flex flex-col gap-6 px-8 md:px-14 lg:px-20 py-10">
 
@@ -316,11 +326,11 @@ export default function Hero() {
 
         </div>
 
-        {/* Right column — no border, no bg, card floats freely */}
+        {/* Right column — card floats freely, tucked up -20px */}
         <motion.div
           {...fade(0.35)}
-          className="hidden md:flex items-center justify-center py-10"
-          style={{ width: '42%', flexShrink: 0, paddingRight: '40px' }}
+          className="hidden md:flex items-start justify-center py-10"
+          style={{ width: '42%', flexShrink: 0, paddingRight: '40px', marginTop: '-20px' }}
         >
           <PolaroidCard />
         </motion.div>
