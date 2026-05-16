@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { SmallAsterisk, CornerBracket } from './Annotations.jsx'
 
 const projects = [
   {
@@ -55,6 +56,103 @@ const projects = [
   },
 ]
 
+// SVG illustration for each card cover
+function CoverIllustration({ num }) {
+  const s = { stroke: '#f0ebe3', strokeWidth: 2, fill: 'none', strokeLinecap: 'round', strokeLinejoin: 'round' }
+  const sf = { ...s, fill: '#f0ebe3' }
+
+  if (num === '01') return (
+    <svg width={80} height={80} viewBox="0 0 80 80">
+      {/* Spool top ellipse */}
+      <ellipse cx="40" cy="22" rx="22" ry="8" {...s} />
+      {/* Spool bottom ellipse */}
+      <ellipse cx="40" cy="54" rx="22" ry="8" {...s} />
+      {/* Spool sides */}
+      <line x1="18" y1="22" x2="18" y2="54" {...s} />
+      <line x1="62" y1="22" x2="62" y2="54" {...s} />
+      {/* Middle wrap dashed */}
+      <ellipse cx="40" cy="38" rx="14" ry="5" stroke="#f0ebe3" strokeWidth="1.5" fill="none" strokeDasharray="3 3" strokeLinecap="round" />
+      {/* Loose thread coming off */}
+      <path d="M 58,26 C 66,18 74,14 71,7 C 69,2 76,4 78,10" {...s} />
+    </svg>
+  )
+
+  if (num === '02') return (
+    <svg width={80} height={80} viewBox="0 0 80 80">
+      {/* Newspaper body */}
+      <rect x="8" y="10" width="60" height="60" rx="1" {...s} />
+      {/* Header rule */}
+      <line x1="14" y1="24" x2="62" y2="24" {...s} />
+      {/* Folded corner top right */}
+      <path d="M 57,10 L 68,10 L 68,21 L 57,21 Z" {...s} />
+      <line x1="57" y1="10" x2="68" y2="21" {...s} />
+      {/* Text column lines */}
+      <line x1="14" y1="32" x2="38" y2="32" {...s} />
+      <line x1="14" y1="38" x2="38" y2="38" {...s} />
+      <line x1="14" y1="44" x2="38" y2="44" {...s} />
+      {/* Heart */}
+      <path d="M 40,62 C 40,62 26,52 26,44 C 26,40 30,37 34,40 C 37,42 40,46 40,46 C 40,46 43,42 46,40 C 50,37 54,40 54,44 C 54,52 40,62 40,62 Z" {...s} />
+    </svg>
+  )
+
+  if (num === '03') return (
+    <svg width={80} height={80} viewBox="0 0 80 80">
+      {/* Magnifying glass lens */}
+      <circle cx="36" cy="36" r="22" {...s} />
+      {/* Handle */}
+      <line x1="52" y1="52" x2="72" y2="72" stroke="#f0ebe3" strokeWidth="5" strokeLinecap="round" />
+      {/* Scatter dots inside */}
+      <circle cx="28" cy="30" r="2.5" fill="#f0ebe3" stroke="none" />
+      <circle cx="38" cy="26" r="2.5" fill="#f0ebe3" stroke="none" />
+      <circle cx="44" cy="34" r="2.5" fill="#f0ebe3" stroke="none" />
+      <circle cx="30" cy="42" r="2.5" fill="#f0ebe3" stroke="none" />
+      <circle cx="42" cy="44" r="2.5" fill="#f0ebe3" stroke="none" />
+      {/* Dashed classification boundary */}
+      <path d="M 18,46 C 28,36 38,30 54,22" stroke="#f0ebe3" strokeWidth="1.5" fill="none" strokeDasharray="3 3" strokeLinecap="round" />
+    </svg>
+  )
+
+  if (num === '04') return (
+    <svg width={80} height={80} viewBox="0 0 80 80">
+      {/* Y axis */}
+      <line x1="16" y1="68" x2="16" y2="10" {...s} />
+      {/* X axis */}
+      <line x1="16" y1="68" x2="72" y2="68" {...s} />
+      {/* Bars — short, medium, tall */}
+      <rect x="24" y="52" width="12" height="16" {...s} />
+      <rect x="42" y="38" width="12" height="30" {...s} />
+      <rect x="60" y="22" width="12" height="46" {...s} />
+      {/* Arrow above tallest bar */}
+      <line x1="66" y1="18" x2="66" y2="10" {...s} />
+      <path d="M 62,14 L 66,10 L 70,14" {...s} />
+    </svg>
+  )
+
+  if (num === '05') return (
+    <svg width={80} height={80} viewBox="0 0 80 80">
+      {/* Browser frame */}
+      <rect x="5" y="5" width="70" height="70" rx="4" {...s} />
+      {/* Browser bar */}
+      <line x1="5" y1="20" x2="75" y2="20" {...s} />
+      {/* Browser dots */}
+      <circle cx="14" cy="13" r="2.5" {...sf} />
+      <circle cx="22" cy="13" r="2.5" {...sf} />
+      <circle cx="30" cy="13" r="2.5" {...sf} />
+      {/* Big name lines */}
+      <line x1="12" y1="32" x2="68" y2="32" stroke="#f0ebe3" strokeWidth="4" strokeLinecap="round" />
+      <line x1="12" y1="40" x2="55" y2="40" stroke="#f0ebe3" strokeWidth="4" strokeLinecap="round" />
+      {/* Card placeholder rect */}
+      <rect x="46" y="48" width="20" height="20" {...s} />
+      {/* Body text lines */}
+      <line x1="12" y1="50" x2="38" y2="50" {...s} />
+      <line x1="12" y1="56" x2="38" y2="56" {...s} />
+      <line x1="12" y1="62" x2="34" y2="62" {...s} />
+    </svg>
+  )
+
+  return null
+}
+
 function ToolPill({ label }) {
   return (
     <span
@@ -74,6 +172,7 @@ function ToolPill({ label }) {
 
 function ProjectCard({ project, onClick }) {
   const [hovered, setHovered] = useState(false)
+  const showAsterisk = project.num === '01' || project.num === '02'
 
   return (
     <div
@@ -95,11 +194,22 @@ function ProjectCard({ project, onClick }) {
       <div
         style={{
           flex: '0 0 60%',
-          backgroundColor: '#2c2420',
+          backgroundColor: '#3d2e28',
           opacity: hovered ? 0.85 : 1,
           transition: 'opacity 0.2s ease',
+          position: 'relative',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
         }}
-      />
+      >
+        <CoverIllustration num={project.num} />
+        {showAsterisk && (
+          <div style={{ position: 'absolute', top: '10px', right: '10px', opacity: 0.6, pointerEvents: 'none' }}>
+            <SmallAsterisk color="#f0ebe3" size={20} />
+          </div>
+        )}
+      </div>
 
       {/* Info — bottom 40% */}
       <div
@@ -323,19 +433,24 @@ export default function Work() {
 
       {/* Section header */}
       <div className="px-8 md:px-14 lg:px-20 pt-20 pb-0">
-        <div className="flex items-baseline gap-5 pb-4">
+        <div className="flex items-baseline gap-5 pb-4" style={{ position: 'relative', display: 'inline-flex', alignItems: 'baseline' }}>
           <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: '12px', color: '#b0a898' }}>01</span>
-          <h2
-            style={{
-              fontFamily: "'Bebas Neue', sans-serif",
-              fontSize: 'clamp(48px, 7vw, 80px)',
-              letterSpacing: '0.04em',
-              lineHeight: 1,
-              color: '#1a1814',
-            }}
-          >
-            Work
-          </h2>
+          <div style={{ position: 'relative', display: 'inline-block' }}>
+            <h2
+              style={{
+                fontFamily: "'Bebas Neue', sans-serif",
+                fontSize: 'clamp(48px, 7vw, 80px)',
+                letterSpacing: '0.04em',
+                lineHeight: 1,
+                color: '#1a1814',
+              }}
+            >
+              Work
+            </h2>
+            <div style={{ position: 'absolute', inset: '-8px -12px', pointerEvents: 'none' }}>
+              <CornerBracket color="#c9b99a" size={36} />
+            </div>
+          </div>
         </div>
         <div style={{ borderTop: '1px solid #d4ccc0' }} />
       </div>

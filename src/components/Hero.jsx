@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import { WobblyCircle, RoughUnderline, SmallAsterisk, ArrowRight } from './Annotations.jsx'
 
 const fade = (delay = 0) => ({
   initial: { opacity: 0, y: 12 },
@@ -6,11 +7,14 @@ const fade = (delay = 0) => ({
   transition: { duration: 0.55, ease: 'easeOut', delay },
 })
 
-const rule = { borderColor: '#d4ccc0' }
-
 export default function Hero() {
   return (
-    <section id="hero" style={{ backgroundColor: '#faf8f5' }} className="flex flex-col">
+    <section id="hero" style={{ backgroundColor: '#faf8f5', position: 'relative' }} className="flex flex-col">
+
+      {/* Decorative asterisk — top right */}
+      <div style={{ position: 'absolute', top: '14px', right: '56px', opacity: 0.4, pointerEvents: 'none', zIndex: 1 }}>
+        <SmallAsterisk color="#1a1814" size={22} />
+      </div>
 
       {/* Top ruled line */}
       <div style={{ borderTop: '1px solid #d4ccc0' }} />
@@ -48,7 +52,7 @@ export default function Hero() {
       <motion.div
         {...fade(0.2)}
         className="px-8 md:px-14 lg:px-20 py-3"
-        style={{ borderBottom: '1px solid #d4ccc0' }}
+        style={{ borderBottom: '1px solid #d4ccc0', position: 'relative' }}
       >
         <h1
           style={{
@@ -61,28 +65,39 @@ export default function Hero() {
         >
           PARIDHI BANSAL
         </h1>
+        {/* Underline beneath "Bansal" */}
+        <div style={{ position: 'absolute', bottom: '10px', left: 'clamp(32px, 5.5vw, 80px)', pointerEvents: 'none' }}>
+          <RoughUnderline color="#c9b99a" width={280} />
+        </div>
       </motion.div>
 
       {/* Body — two columns */}
-      <div className="flex-1 flex" style={{ borderBottom: '1px solid #d4ccc0' }}>
+      <div className="flex-1 flex" style={{ borderBottom: '1px solid #d4ccc0', position: 'relative' }}>
 
         {/* Left column */}
         <div
           className="flex-1 flex flex-col gap-6 px-8 md:px-14 lg:px-20 py-10"
           style={{ borderRight: '1px solid #d4ccc0' }}
         >
-          {/* Tagline */}
-          <motion.p
-            {...fade(0.3)}
-            style={{
-              fontFamily: "'Bebas Neue', sans-serif",
-              fontSize: 'clamp(18px, 2.5vw, 26px)',
-              letterSpacing: '0.12em',
-              color: '#c9b99a',
-            }}
-          >
-            PSYCHOLOGY × DATA SCIENCE
-          </motion.p>
+          {/* Tagline with WobblyCircle overlay */}
+          <div style={{ position: 'relative', alignSelf: 'flex-start' }}>
+            <motion.p
+              {...fade(0.3)}
+              style={{
+                fontFamily: "'Bebas Neue', sans-serif",
+                fontSize: 'clamp(18px, 2.5vw, 26px)',
+                letterSpacing: '0.12em',
+                color: '#c9b99a',
+                position: 'relative',
+                zIndex: 2,
+              }}
+            >
+              PSYCHOLOGY × DATA SCIENCE
+            </motion.p>
+            <div style={{ position: 'absolute', top: '-16px', left: '-18px', pointerEvents: 'none', zIndex: 1 }}>
+              <WobblyCircle color="#1a1814" size={360} />
+            </div>
+          </div>
 
           {/* Roles */}
           <motion.p
@@ -181,6 +196,21 @@ export default function Hero() {
             </p>
           </motion.div>
 
+        </div>
+
+        {/* Arrow pointing at the card — sits at vertical midpoint between columns */}
+        <div
+          className="hidden md:flex items-center"
+          style={{
+            position: 'absolute',
+            left: 'calc(62% - 52px)',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            pointerEvents: 'none',
+            zIndex: 2,
+          }}
+        >
+          <ArrowRight color="#c9b99a" size={44} />
         </div>
 
         {/* Right column — placeholder card */}

@@ -195,7 +195,31 @@ function ExperienceEntry({ entry, index }) {
 
 export default function Experience() {
   return (
-    <section id="experience" style={{ backgroundColor: '#faf8f5' }}>
+    <section id="experience" style={{ backgroundColor: '#faf8f5', position: 'relative' }}>
+
+      {/* Vertical EST. label — far left decorative */}
+      <div
+        className="hidden lg:block"
+        style={{
+          position: 'absolute',
+          left: '10px',
+          top: '50%',
+          transform: 'translateY(-50%) rotate(-90deg)',
+          transformOrigin: 'center center',
+          pointerEvents: 'none',
+          whiteSpace: 'nowrap',
+        }}
+      >
+        <span style={{
+          fontFamily: "'DM Sans', sans-serif",
+          fontSize: '9px',
+          textTransform: 'uppercase',
+          letterSpacing: '0.2em',
+          color: '#c9b99a',
+        }}>
+          — Est. 2022 —
+        </span>
+      </div>
 
       {/* Section header */}
       <div className="px-8 md:px-14 lg:px-20 pt-20 pb-0">
