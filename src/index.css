@@ -15,7 +15,3 @@ body {
 .font-display {
   font-family: 'Cormorant Garamond', serif;
 }
-
-@keyframes drawPath {
-  to { stroke-dashoffset: 0; }
-}
