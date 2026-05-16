@@ -2,28 +2,17 @@ import { useRef, useEffect } from 'react'
 import { motion, useMotionValue, useSpring, animate } from 'framer-motion'
 
 function PolaroidCard() {
-  const rawRotation = useMotionValue(-12)
+  const rawRotation = useMotionValue(12)
   const rotation = useSpring(rawRotation, { stiffness: 150, damping: 15 })
 
   const isDragging = useRef(false)
   const startX = useRef(0)
-  const idleControl = useRef(null)
 
+  // Entry only: 12deg → 3deg over 1s easeOut, then still
   useEffect(() => {
-    // Entry: -12deg → -3deg over 1.2s, then idle sway
-    const entry = animate(rawRotation, -3, { duration: 1.2, ease: 'easeOut' })
-    entry.then(() => {
-      idleControl.current = animate(rawRotation, [-4, -2], {
-        duration: 3,
-        ease: 'easeInOut',
-        repeat: Infinity,
-        repeatType: 'mirror',
-      })
-    })
-    return () => {
-      entry.stop()
-      idleControl.current?.stop()
-    }
+    rawRotation.set(12)
+    const entry = animate(rawRotation, 3, { duration: 1, ease: 'easeOut' })
+    return () => entry.stop()
   }, [])
 
   const onPointerDown = (e) => {
@@ -31,8 +20,6 @@ function PolaroidCard() {
     startX.current = e.clientX
     e.currentTarget.setPointerCapture(e.pointerId)
     document.body.style.cursor = 'grabbing'
-    idleControl.current?.stop()
-    idleControl.current = null
   }
 
   const onPointerMove = (e) => {
@@ -45,31 +32,23 @@ function PolaroidCard() {
     if (!isDragging.current) return
     isDragging.current = false
     document.body.style.cursor = ''
-    animate(rawRotation, -3, { type: 'spring', stiffness: 150, damping: 15 }).then(() => {
-      idleControl.current = animate(rawRotation, [-4, -2], {
-        duration: 3,
-        ease: 'easeInOut',
-        repeat: Infinity,
-        repeatType: 'mirror',
-      })
-    })
+    animate(rawRotation, 3, { type: 'spring', stiffness: 150, damping: 15 })
   }
 
   return (
     <div
       style={{
-        width: '320px',
+        width: '380px',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         userSelect: 'none',
       }}
     >
-      {/* Entry fade-in + scale, rotation handled by useSpring above */}
       <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 1.2, ease: 'easeOut' }}
+        initial={{ opacity: 0, scale: 0.92, y: -20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ duration: 1, ease: 'easeOut' }}
         style={{
           display: 'flex',
           flexDirection: 'column',
@@ -105,7 +84,7 @@ function PolaroidCard() {
           onPointerMove={onPointerMove}
           onPointerUp={onPointerUp}
           style={{
-            width: '280px',
+            width: '340px',
             backgroundColor: '#ffffff',
             padding: '12px 12px 40px 12px',
             boxShadow: '0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.08)',
@@ -185,10 +164,7 @@ export default function Hero() {
       style={{ backgroundColor: '#faf8f5', paddingTop: '80px' }}
       className="flex flex-col"
     >
-      {/* Top ruled line */}
-      <div style={{ borderTop: '1px solid #d4ccc0' }} />
-
-      {/* Name block — no bottom border */}
+      {/* Name block */}
       <motion.div
         {...fade(0.2)}
         className="px-8 md:px-14 lg:px-20 py-3"
@@ -326,7 +302,7 @@ export default function Hero() {
 
         </div>
 
-        {/* Right column — card floats freely, tucked up -20px */}
+        {/* Right column — no border, card floats freely, tucked up -20px */}
         <motion.div
           {...fade(0.35)}
           className="hidden md:flex items-start justify-center py-10"
