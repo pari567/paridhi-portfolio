@@ -1,184 +1,166 @@
 import { useRef, useEffect } from 'react'
-import { motion } from 'framer-motion'
-import { Canvas, useFrame, useThree } from '@react-three/fiber'
-import { Physics, RigidBody, useRopeJoint, BallCollider, CuboidCollider } from '@react-three/rapier'
-import * as THREE from 'three'
+import { motion, useMotionValue, useSpring, animate } from 'framer-motion'
 
-const CARD_W = 1.2
-const CARD_H = 1.6
-const ROPE_LEN = 1.8
-// Polaroid dimensions — 0.1 white border on top/sides, ~0.5 white space at bottom
-const PHOTO_W = 1.0
-const PHOTO_H = 1.0
-const PHOTO_Y = CARD_H / 2 - 0.1 - PHOTO_H / 2   // 0.2
+function PolaroidCard() {
+  const rawRotation = useMotionValue(0)
+  const rotation = useSpring(rawRotation, { stiffness: 150, damping: 15 })
 
-const _yAxis = new THREE.Vector3(0, 1, 0)
-const _dir = new THREE.Vector3()
-const _mid = new THREE.Vector3()
-const _localTop = new THREE.Vector3()
-const _q = new THREE.Quaternion()
-
-function Scene() {
-  const anchorRef = useRef()
-  const cardRef   = useRef()
-  const stringRef = useRef()
-  const matRef    = useRef()
   const isDragging = useRef(false)
-  const { camera, gl } = useThree()
+  const startX = useRef(0)
 
-  useRopeJoint(anchorRef, cardRef, [[0, 0, 0], [0, CARD_H / 2, 0], ROPE_LEN])
-
-  // Load photo texture imperatively — no re-render, just mutate the material
+  // Settling swing on mount: start at -8°, overshoot to ~3°, settle to 0°
   useEffect(() => {
-    new THREE.TextureLoader().load(
-      '/photo.jpg',
-      (tex) => {
-        if (!matRef.current) return
-        matRef.current.map = tex
-        matRef.current.needsUpdate = true
-      },
-      undefined,
-      () => {}
-    )
+    rawRotation.set(-8)
+    const timer = setTimeout(() => {
+      animate(rawRotation, 0, { type: 'spring', stiffness: 55, damping: 9 })
+    }, 300)
+    return () => clearTimeout(timer)
   }, [])
 
-  useEffect(() => {
-    const onUp = () => {
-      isDragging.current = false
-      gl.domElement.style.cursor = 'grab'
-    }
-    window.addEventListener('pointerup', onUp)
-    return () => window.removeEventListener('pointerup', onUp)
-  }, [gl])
+  const onPointerDown = (e) => {
+    isDragging.current = true
+    startX.current = e.clientX
+    e.currentTarget.setPointerCapture(e.pointerId)
+    document.body.style.cursor = 'grabbing'
+  }
 
-  useFrame(() => {
-    if (!anchorRef.current || !cardRef.current || !stringRef.current) return
+  const onPointerMove = (e) => {
+    if (!isDragging.current) return
+    const dx = e.clientX - startX.current
+    rawRotation.set(Math.max(-25, Math.min(25, dx / 6)))
+  }
 
-    const a = anchorRef.current.translation()
-    const c = cardRef.current.translation()
-    const rot = cardRef.current.rotation()
-
-    // World position of the card's local top-centre (eyelet), accounting for rotation
-    _localTop.set(0, CARD_H / 2, 0)
-    _q.set(rot.x, rot.y, rot.z, rot.w)
-    _localTop.applyQuaternion(_q)
-
-    const ax = a.x, ay = a.y, az = a.z
-    const tx = c.x + _localTop.x, ty = c.y + _localTop.y, tz = c.z + _localTop.z
-
-    // Reposition and orient the string cylinder
-    _mid.set((ax + tx) / 2, (ay + ty) / 2, (az + tz) / 2)
-    _dir.set(tx - ax, ty - ay, tz - az)
-    const len = _dir.length()
-
-    stringRef.current.position.copy(_mid)
-    stringRef.current.scale.set(1, len, 1)
-
-    if (len > 0.001) {
-      _dir.divideScalar(len)
-      const cross = new THREE.Vector3().crossVectors(_yAxis, _dir)
-      if (cross.lengthSq() < 1e-6) {
-        // Parallel or anti-parallel
-        stringRef.current.quaternion.set(_dir.y < 0 ? 1 : 0, 0, 0, _dir.y < 0 ? 0 : 1)
-      } else {
-        stringRef.current.quaternion.setFromUnitVectors(_yAxis, _dir)
-      }
-    }
-  })
-
-  const getPlanePos = (e) => {
-    const rect = gl.domElement.getBoundingClientRect()
-    const nx = ((e.clientX - rect.left) / rect.width) * 2 - 1
-    const ny = -((e.clientY - rect.top) / rect.height) * 2 + 1
-    const v = new THREE.Vector3(nx, ny, 0.5).unproject(camera)
-    const dir = v.clone().sub(camera.position).normalize()
-    const t = -camera.position.z / dir.z
-    return camera.position.clone().add(dir.multiplyScalar(t))
+  const onPointerUp = () => {
+    if (!isDragging.current) return
+    isDragging.current = false
+    document.body.style.cursor = ''
+    animate(rawRotation, 0, { type: 'spring', stiffness: 150, damping: 15 })
   }
 
   return (
-    <>
-      {/* Fixed anchor — above the visible canvas area */}
-      <RigidBody ref={anchorRef} type="fixed" position={[0, 2, 0]}>
-        <BallCollider args={[0.05]} />
-      </RigidBody>
-
-      {/* String cylinder — height=1 base, scaled in useFrame */}
-      <mesh ref={stringRef} scale={[1, 0.001, 1]}>
-        <cylinderGeometry args={[0.012, 0.012, 1, 6]} />
-        <meshBasicMaterial color="#c9b99a" />
-      </mesh>
-
-      {/* Card rigid body */}
-      <RigidBody
-        ref={cardRef}
-        position={[0.5, 0, 0]}
-        linearDamping={4}
-        angularDamping={4}
-        colliders={false}
+    <div
+      style={{
+        width: '320px',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        userSelect: 'none',
+      }}
+    >
+      {/* Rotating group — transforms around the anchor at top centre */}
+      <motion.div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          rotate: rotation,
+          transformOrigin: 'top center',
+        }}
       >
-        <CuboidCollider args={[CARD_W / 2, CARD_H / 2, 0.02]} />
-
-        {/* White card base */}
-        <mesh>
-          <planeGeometry args={[CARD_W, CARD_H]} />
-          <meshBasicMaterial color="#ffffff" />
-        </mesh>
-
-        {/* Photo — true colour, no tint */}
-        <mesh
-          position={[0, PHOTO_Y, 0.002]}
-          onPointerDown={(e) => {
-            e.stopPropagation()
-            isDragging.current = true
-            gl.domElement.style.cursor = 'grabbing'
+        {/* Attachment circle */}
+        <div
+          style={{
+            width: '8px',
+            height: '8px',
+            borderRadius: '50%',
+            backgroundColor: '#c9b99a',
+            flexShrink: 0,
           }}
-          onPointerMove={(e) => {
-            if (!isDragging.current || !cardRef.current) return
-            const pos = getPlanePos(e.nativeEvent)
-            cardRef.current.setTranslation({ x: pos.x, y: pos.y, z: 0 }, true)
-            cardRef.current.setLinvel({ x: 0, y: 0, z: 0 }, true)
+        />
+
+        {/* String */}
+        <div
+          style={{
+            width: '1.5px',
+            height: '60px',
+            backgroundColor: '#c9b99a',
+            flexShrink: 0,
+          }}
+        />
+
+        {/* Bottom circle where string meets card */}
+        <div
+          style={{
+            width: '6px',
+            height: '6px',
+            borderRadius: '50%',
+            backgroundColor: '#b0a090',
+            flexShrink: 0,
+            position: 'relative',
+            top: '3px',
+            zIndex: 1,
+          }}
+        />
+
+        {/* Polaroid card */}
+        <motion.div
+          whileHover={{ scale: 1.02 }}
+          onPointerDown={onPointerDown}
+          onPointerMove={onPointerMove}
+          onPointerUp={onPointerUp}
+          style={{
+            width: '280px',
+            backgroundColor: '#ffffff',
+            padding: '12px 12px 40px 12px',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.08)',
+            borderRadius: '2px',
+            cursor: 'grab',
+            touchAction: 'none',
           }}
         >
-          <planeGeometry args={[PHOTO_W, PHOTO_H]} />
-          <meshBasicMaterial ref={matRef} />
-        </mesh>
+          <img
+            src="/photo.jpg"
+            alt="Paridhi Bansal"
+            draggable={false}
+            style={{
+              width: '100%',
+              aspectRatio: '1 / 1',
+              objectFit: 'cover',
+              objectPosition: 'center top',
+              display: 'block',
+              filter: 'contrast(1.05) saturate(1.15) brightness(1.05)',
+            }}
+          />
+          <p
+            style={{
+              fontFamily: "'Cormorant Garamond', serif",
+              fontStyle: 'italic',
+              fontSize: '14px',
+              color: '#1a1814',
+              textAlign: 'center',
+              margin: '8px 0 3px',
+            }}
+          >
+            Paridhi Bansal
+          </p>
+          <p
+            style={{
+              fontFamily: "'DM Sans', sans-serif",
+              fontSize: '9px',
+              textTransform: 'uppercase',
+              letterSpacing: '0.1em',
+              color: '#c9b99a',
+              textAlign: 'center',
+              margin: 0,
+            }}
+          >
+            Psychology × Data Science
+          </p>
+        </motion.div>
+      </motion.div>
 
-        {/* Eyelet — small cylinder at top of card, viewed as a disc from the front */}
-        <mesh position={[0, CARD_H / 2, 0.003]} rotation={[Math.PI / 2, 0, 0]}>
-          <cylinderGeometry args={[0.05, 0.05, 0.1, 10]} />
-          <meshBasicMaterial color="#999999" />
-        </mesh>
-      </RigidBody>
-    </>
-  )
-}
-
-function LanyardCard() {
-  return (
-    <div style={{ position: 'relative' }}>
-      <Canvas
-        style={{ width: '420px', height: '560px', cursor: 'grab', display: 'block' }}
-        camera={{ position: [0, 0, 5], fov: 40 }}
-        gl={{ alpha: true }}
-        onCreated={({ gl }) => gl.setClearColor(0x000000, 0)}
-      >
-        <Physics gravity={[0, -20, 0]}>
-          <Scene />
-        </Physics>
-      </Canvas>
+      {/* Label */}
       <p
         style={{
           fontFamily: "'DM Sans', sans-serif",
-          fontSize: '10px',
+          fontSize: '9px',
           textTransform: 'uppercase',
           letterSpacing: '0.12em',
           color: '#b0a898',
-          textAlign: 'center',
-          marginTop: '6px',
+          marginTop: '14px',
         }}
       >
-        drag me
+        ↔ drag me
       </p>
     </div>
   )
@@ -216,11 +198,12 @@ export default function Hero() {
         </h1>
       </motion.div>
 
-      {/* Body — two columns, no dividing line */}
+      {/* Body — two columns */}
       <div className="flex-1 flex" style={{ borderBottom: '1px solid #d4ccc0' }}>
 
-        {/* Left column — no right border so the two elements breathe */}
+        {/* Left column */}
         <div className="flex-1 flex flex-col gap-6 px-8 md:px-14 lg:px-20 py-10">
+
           {/* Tagline */}
           <motion.p
             {...fade(0.3)}
@@ -333,13 +316,13 @@ export default function Hero() {
 
         </div>
 
-        {/* Right column — clean, no border/bg/shadow so card floats freely */}
+        {/* Right column — no border, no bg, card floats freely */}
         <motion.div
           {...fade(0.35)}
           className="hidden md:flex items-center justify-center py-10"
           style={{ width: '42%', flexShrink: 0, paddingRight: '40px' }}
         >
-          <LanyardCard />
+          <PolaroidCard />
         </motion.div>
       </div>
 
