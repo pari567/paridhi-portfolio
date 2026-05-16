@@ -138,6 +138,18 @@ export default function Contact() {
               </div>
             ))}
           </div>
+
+          <div style={{ borderTop: '1px solid #e8e3db', paddingTop: '10px' }}>
+            <p style={{
+              fontFamily: "'DM Sans', sans-serif",
+              fontSize: '11px',
+              fontStyle: 'italic',
+              color: '#b0a898',
+              margin: 0,
+            }}>
+              Eligible to work in Canada (PGWP)
+            </p>
+          </div>
         </motion.div>
       </div>
 

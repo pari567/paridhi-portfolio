@@ -130,7 +130,7 @@ function AlsoMeCard({ card, index }) {
 
 export default function AlsoMe() {
   return (
-    <section id="alsome" style={{ backgroundColor: '#faf8f5' }}>
+    <section id="also-me" style={{ backgroundColor: '#faf8f5' }}>
 
       {/* Section header */}
       <div className="px-8 md:px-14 lg:px-20 pt-20 pb-0">

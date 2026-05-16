@@ -1,4 +1,133 @@
+import { useRef, useEffect } from 'react'
 import { motion } from 'framer-motion'
+import { Canvas, useFrame, useThree } from '@react-three/fiber'
+import { Physics, RigidBody, useRopeJoint, BallCollider, CuboidCollider } from '@react-three/rapier'
+import * as THREE from 'three'
+
+const CARD_W = 1.2
+const CARD_H = 1.6
+const ROPE_LEN = 1.8
+
+function Scene() {
+  const anchorRef = useRef()
+  const cardRef = useRef()
+  const lineRef = useRef()
+  const matRef = useRef()
+  const isDragging = useRef(false)
+  const { camera, gl } = useThree()
+
+  useRopeJoint(anchorRef, cardRef, [[0, 0, 0], [0, CARD_H / 2, 0], ROPE_LEN])
+
+  useEffect(() => {
+    new THREE.TextureLoader().load(
+      '/photo.jpg',
+      (tex) => {
+        if (!matRef.current) return
+        matRef.current.map = tex
+        matRef.current.color.set(0xffffff)
+        matRef.current.needsUpdate = true
+      },
+      undefined,
+      () => {}
+    )
+  }, [])
+
+  useEffect(() => {
+    const onUp = () => {
+      isDragging.current = false
+      gl.domElement.style.cursor = 'grab'
+    }
+    window.addEventListener('pointerup', onUp)
+    return () => window.removeEventListener('pointerup', onUp)
+  }, [gl])
+
+  useFrame(() => {
+    if (!anchorRef.current || !cardRef.current || !lineRef.current) return
+    const a = anchorRef.current.translation()
+    const c = cardRef.current.translation()
+    lineRef.current.geometry.setFromPoints([
+      new THREE.Vector3(a.x, a.y, a.z),
+      new THREE.Vector3(c.x, c.y + CARD_H / 2, c.z),
+    ])
+  })
+
+  const getPlanePos = (e) => {
+    const rect = gl.domElement.getBoundingClientRect()
+    const nx = ((e.clientX - rect.left) / rect.width) * 2 - 1
+    const ny = -((e.clientY - rect.top) / rect.height) * 2 + 1
+    const v = new THREE.Vector3(nx, ny, 0.5).unproject(camera)
+    const dir = v.clone().sub(camera.position).normalize()
+    const t = -camera.position.z / dir.z
+    return camera.position.clone().add(dir.multiplyScalar(t))
+  }
+
+  return (
+    <>
+      <RigidBody ref={anchorRef} type="fixed" position={[0, 2, 0]}>
+        <BallCollider args={[0.05]} />
+      </RigidBody>
+
+      <line ref={lineRef}>
+        <bufferGeometry />
+        <lineBasicMaterial color="#c9b99a" />
+      </line>
+
+      <RigidBody
+        ref={cardRef}
+        position={[0.5, 0, 0]}
+        linearDamping={4}
+        angularDamping={4}
+      >
+        <CuboidCollider args={[CARD_W / 2, CARD_H / 2, 0.01]} />
+        <mesh
+          onPointerDown={(e) => {
+            e.stopPropagation()
+            isDragging.current = true
+            gl.domElement.style.cursor = 'grabbing'
+          }}
+          onPointerMove={(e) => {
+            if (!isDragging.current || !cardRef.current) return
+            const pos = getPlanePos(e.nativeEvent)
+            cardRef.current.setTranslation({ x: pos.x, y: pos.y, z: 0 }, true)
+            cardRef.current.setLinvel({ x: 0, y: 0, z: 0 }, true)
+          }}
+        >
+          <planeGeometry args={[CARD_W, CARD_H]} />
+          <meshBasicMaterial ref={matRef} color="#f0ebe3" />
+        </mesh>
+      </RigidBody>
+    </>
+  )
+}
+
+function LanyardCard() {
+  return (
+    <div style={{ position: 'relative' }}>
+      <Canvas
+        style={{ width: '300px', height: '400px', cursor: 'grab' }}
+        camera={{ position: [0, 0, 5], fov: 40 }}
+        gl={{ alpha: true }}
+      >
+        <Physics gravity={[0, -20, 0]}>
+          <Scene />
+        </Physics>
+      </Canvas>
+      <p
+        style={{
+          fontFamily: "'DM Sans', sans-serif",
+          fontSize: '10px',
+          textTransform: 'uppercase',
+          letterSpacing: '0.12em',
+          color: '#b0a898',
+          textAlign: 'center',
+          marginTop: '6px',
+        }}
+      >
+        drag me
+      </p>
+    </div>
+  )
+}
 
 const fade = (delay = 0) => ({
   initial: { opacity: 0, y: 12 },
@@ -12,35 +141,6 @@ export default function Hero() {
 
       {/* Top ruled line */}
       <div style={{ borderTop: '1px solid #d4ccc0' }} />
-
-      {/* Status row */}
-      <motion.div
-        {...fade(0.1)}
-        className="flex items-center justify-between px-8 md:px-14 lg:px-20 py-3"
-        style={{ borderBottom: '1px solid #d4ccc0' }}
-      >
-        <div className="flex items-center gap-2">
-          <span className="relative flex h-2 w-2">
-            <span
-              className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75"
-              style={{ backgroundColor: '#c9b99a' }}
-            />
-            <span
-              className="relative inline-flex rounded-full h-2 w-2"
-              style={{ backgroundColor: '#c9b99a' }}
-            />
-          </span>
-          <span className="text-xs tracking-wide" style={{ color: '#6b6459' }}>
-            Available · Vancouver, BC · Eligible to work in Canada (PGWP)
-          </span>
-        </div>
-        <span
-          className="text-xs tracking-widest font-light"
-          style={{ color: '#b0a898', fontFamily: "'DM Sans', sans-serif" }}
-        >
-          00
-        </span>
-      </motion.div>
 
       {/* Name block */}
       <motion.div
@@ -181,50 +281,15 @@ export default function Hero() {
 
         </div>
 
-        {/* Right column — placeholder card */}
+        {/* Right column — lanyard card */}
         <motion.div
           {...fade(0.35)}
           className="hidden md:flex items-center justify-center px-10 lg:px-16 py-10"
           style={{ width: '38%', flexShrink: 0 }}
         >
-          <div
-            className="w-full flex items-center justify-center"
-            style={{
-              aspectRatio: '3 / 4',
-              border: '1px solid #c9b99a',
-              backgroundColor: 'rgba(201,185,154,0.04)',
-            }}
-          >
-            <span
-              className="text-xs tracking-widest uppercase"
-              style={{ color: '#b0a898', fontFamily: "'DM Sans', sans-serif" }}
-            >
-              photo coming soon
-            </span>
-          </div>
+          <LanyardCard />
         </motion.div>
       </div>
-
-      {/* Currently strip */}
-      <motion.div
-        {...fade(0.65)}
-        className="grid grid-cols-3 text-xs"
-        style={{ fontFamily: "'DM Sans', sans-serif", color: '#6b6459' }}
-      >
-        {[
-          'BA completed · Psychology + Data Science, UBC May 2026',
-          'Building in public · this site and a few other projects',
-          'Open to work · UX research, consumer insights, people-focused roles',
-        ].map((item, i) => (
-          <div
-            key={i}
-            className="px-8 md:px-14 lg:px-20 py-4 leading-relaxed font-light"
-            style={i < 2 ? { borderRight: '1px solid #d4ccc0' } : {}}
-          >
-            {item}
-          </div>
-        ))}
-      </motion.div>
 
     </section>
   )

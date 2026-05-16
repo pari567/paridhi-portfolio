@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 const links = [
   { label: 'Work',       href: '#work' },
   { label: 'Experience', href: '#experience' },
+  { label: 'Also Me',    href: '#also-me' },
   { label: 'Skills',     href: '#skills' },
   { label: 'Contact',    href: '#contact' },
 ]
@@ -35,24 +36,10 @@ export default function Nav() {
         style={{
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'space-between',
+          justifyContent: 'flex-end',
           height: '56px',
         }}
       >
-        {/* Logo */}
-        <a
-          href="#hero"
-          style={{
-            fontFamily: "'Cormorant Garamond', serif",
-            fontSize: '18px',
-            fontStyle: 'italic',
-            color: '#1a1814',
-            textDecoration: 'none',
-          }}
-        >
-          PB
-        </a>
-
         {/* Links */}
         <div style={{ display: 'flex', gap: '28px' }}>
           {links.map(({ label, href }) => (
