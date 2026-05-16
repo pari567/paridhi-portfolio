@@ -2,16 +2,16 @@ import { useRef, useEffect } from 'react'
 import { motion, useMotionValue, useSpring, animate } from 'framer-motion'
 
 function PolaroidCard() {
-  const rawRotation = useMotionValue(12)
+  const rawRotation = useMotionValue(6)
   const rotation = useSpring(rawRotation, { stiffness: 150, damping: 15 })
 
   const isDragging = useRef(false)
   const startX = useRef(0)
 
-  // Entry only: 12deg → 3deg over 1s easeOut, then still
+  // Entry: 6deg → 3deg, scale 0.9 → 1, opacity 0 → 1, 0.8s easeOut, then still
   useEffect(() => {
-    rawRotation.set(12)
-    const entry = animate(rawRotation, 3, { duration: 1, ease: 'easeOut' })
+    rawRotation.set(6)
+    const entry = animate(rawRotation, 3, { duration: 0.8, ease: 'easeOut' })
     return () => entry.stop()
   }, [])
 
@@ -46,9 +46,9 @@ function PolaroidCard() {
       }}
     >
       <motion.div
-        initial={{ opacity: 0, scale: 0.92, y: -20 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        transition={{ duration: 1, ease: 'easeOut' }}
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.8, ease: 'easeOut' }}
         style={{
           display: 'flex',
           flexDirection: 'column',
@@ -57,33 +57,14 @@ function PolaroidCard() {
           transformOrigin: 'top center',
         }}
       >
-        {/* Attachment circle */}
-        <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#c9b99a', flexShrink: 0 }} />
-
-        {/* String */}
-        <div style={{ width: '1.5px', height: '60px', backgroundColor: '#c9b99a', flexShrink: 0 }} />
-
-        {/* Bottom circle where string meets card */}
-        <div
-          style={{
-            width: '6px',
-            height: '6px',
-            borderRadius: '50%',
-            backgroundColor: '#b0a090',
-            flexShrink: 0,
-            position: 'relative',
-            top: '3px',
-            zIndex: 1,
-          }}
-        />
-
-        {/* Polaroid card */}
+        {/* Polaroid card — position relative to contain the pin */}
         <motion.div
           whileHover={{ scale: 1.02 }}
           onPointerDown={onPointerDown}
           onPointerMove={onPointerMove}
           onPointerUp={onPointerUp}
           style={{
+            position: 'relative',
             width: '340px',
             backgroundColor: '#ffffff',
             padding: '12px 12px 40px 12px',
@@ -93,6 +74,22 @@ function PolaroidCard() {
             touchAction: 'none',
           }}
         >
+          {/* Pin */}
+          <div
+            style={{
+              position: 'absolute',
+              top: '-8px',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              width: '14px',
+              height: '14px',
+              borderRadius: '50%',
+              background: 'radial-gradient(circle at 35% 35%, #d4a0a0, #8b3a3a)',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
+              zIndex: 2,
+            }}
+          />
+
           <img
             src="/photo.jpg"
             alt="Paridhi Bansal"
@@ -161,27 +158,9 @@ export default function Hero() {
   return (
     <section
       id="hero"
-      style={{ backgroundColor: '#faf8f5', paddingTop: '80px' }}
+      style={{ backgroundColor: '#faf8f5', paddingTop: '40px' }}
       className="flex flex-col"
     >
-      {/* Name block */}
-      <motion.div
-        {...fade(0.2)}
-        className="px-8 md:px-14 lg:px-20 py-3"
-      >
-        <h1
-          style={{
-            fontFamily: "'Bebas Neue', sans-serif",
-            fontSize: 'clamp(48px, 7vw, 96px)',
-            letterSpacing: '0.02em',
-            lineHeight: 0.92,
-            color: '#1a1814',
-          }}
-        >
-          PARIDHI BANSAL
-        </h1>
-      </motion.div>
-
       {/* Body — two columns */}
       <div
         className="flex-1 flex"
@@ -189,6 +168,37 @@ export default function Hero() {
       >
         {/* Left column */}
         <div className="flex-1 flex flex-col gap-6 px-8 md:px-14 lg:px-20 py-10">
+
+          {/* Name — mixed typeface treatment */}
+          <motion.div {...fade(0.1)}>
+            <h1 style={{ margin: 0, lineHeight: 1 }}>
+              <span
+                style={{
+                  fontFamily: "'Bebas Neue', sans-serif",
+                  fontSize: 'clamp(56px, 8vw, 110px)',
+                  fontWeight: 400,
+                  color: '#1a1814',
+                  letterSpacing: '0.02em',
+                  display: 'block',
+                }}
+              >
+                PARIDHI
+              </span>
+              <span
+                style={{
+                  fontFamily: "'Cormorant Garamond', serif",
+                  fontSize: 'clamp(52px, 7.5vw, 104px)',
+                  fontWeight: 400,
+                  fontStyle: 'italic',
+                  color: '#1a1814',
+                  display: 'block',
+                  marginTop: '-12px',
+                }}
+              >
+                Bansal
+              </span>
+            </h1>
+          </motion.div>
 
           {/* Tagline */}
           <motion.p
@@ -302,11 +312,11 @@ export default function Hero() {
 
         </div>
 
-        {/* Right column — no border, card floats freely, tucked up -20px */}
+        {/* Right column — polaroid aligned to top of name */}
         <motion.div
           {...fade(0.35)}
           className="hidden md:flex items-start justify-center py-10"
-          style={{ width: '42%', flexShrink: 0, paddingRight: '40px', marginTop: '-20px' }}
+          style={{ width: '42%', flexShrink: 0, paddingRight: '40px', marginTop: '-40px' }}
         >
           <PolaroidCard />
         </motion.div>
