@@ -25,7 +25,7 @@ export default function Nav() {
         left: 0,
         right: 0,
         zIndex: 100,
-        backgroundColor: '#faf8f5',
+        backgroundColor: '#f0ebe0',
         borderBottom: '1px solid #e8e3db',
         boxShadow: scrolled ? '0 2px 16px rgba(26,24,20,0.06)' : 'none',
         transition: 'box-shadow 0.25s ease',

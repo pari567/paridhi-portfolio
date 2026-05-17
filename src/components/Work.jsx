@@ -1,5 +1,11 @@
-import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { useState, useRef, useEffect } from 'react'
+import { motion, AnimatePresence, useMotionValue, useTransform, animate } from 'framer-motion'
+
+const CARD_W = 320
+const CARD_H = 440
+const CARD_GAP = 24
+const CARD_TOTAL = CARD_W + CARD_GAP
+const TRACK_H = 520
 
 const projects = [
   {
@@ -38,7 +44,7 @@ const projects = [
     title: 'Bank Marketing Dashboard',
     oneliner: 'Interactive dashboards uncovering what predicts term deposit subscriptions',
     description:
-      'Built four interactive dashboards analysing 41,188 records from a Portuguese bank\'s telephone marketing campaigns. My two views focused on demographic and financial predictors — a linked heatmap showing how education and marital status interact, an age group bar chart, and a brushable scatter plot of macroeconomic indicators. Built with Altair using bi-directional linked highlighting and interval selection.',
+      "Built four interactive dashboards analysing 41,188 records from a Portuguese bank's telephone marketing campaigns. My two views focused on demographic and financial predictors — a linked heatmap showing how education and marital status interact, an age group bar chart, and a brushable scatter plot of macroeconomic indicators. Built with Altair using bi-directional linked highlighting and interval selection.",
     tools: ['Python', 'Altair', 'Vega-Lite', 'pandas', 'Jupyter'],
     links: [],
   },
@@ -48,258 +54,230 @@ const projects = [
     title: 'This Portfolio',
     oneliner: 'Designed and built from scratch — React, Framer Motion, editorial design system',
     description:
-      'This site. Built with React, Vite, Tailwind, and Framer Motion. Designed around an editorial aesthetic — Bebas Neue display type, Cormorant Garamond headings, a warm cream palette, and hand-drawn annotation overlays. Includes an interactive Lab section with a custom attentional bias detector.',
+      'This site. Built with React, Vite, Tailwind, and Framer Motion. Designed around an editorial aesthetic — Bebas Neue display type, Cormorant Garamond headings, a warm cream palette, and hand-drawn annotation overlays.',
     tools: ['React', 'Vite', 'Tailwind CSS', 'Framer Motion'],
     links: [],
     noLink: true,
   },
 ]
 
+// ── ProjectCard ──────────────────────────────────────────────────────────────
 
-function ToolPill({ label }) {
-  return (
-    <span
-      style={{
-        fontFamily: "'DM Sans', sans-serif",
-        fontSize: '11px',
-        letterSpacing: '0.04em',
-        color: '#6b6459',
-        border: '1px solid #d4ccc0',
-        padding: '2px 8px',
-      }}
-    >
-      {label}
-    </span>
-  )
-}
-
-function ProjectCard({ project, onClick }) {
+function ProjectCard({ project, index, scrollX, containerWidthMV, trackPaddingMV, onOpen }) {
   const [hovered, setHovered] = useState(false)
+  const hoverScaleMV = useMotionValue(1)
+
+  // Distance of this card's center from the visible viewport center
+  const dist = useTransform(
+    [scrollX, containerWidthMV, trackPaddingMV],
+    ([s, cw, tp]) => (tp + index * CARD_TOTAL + CARD_W / 2) - (s + cw / 2)
+  )
+
+  const cardRotateY = useTransform(dist, [-900, 0, 900], [12, 0, -12])
+  const cardScale   = useTransform(dist, [-900, 0, 900], [0.94, 1, 0.94])
+  const cardOpacity = useTransform(dist, [-900, 0, 900], [0.7, 1, 0.7])
+  // Multiply scroll-driven scale with hover-driven scale so they compose
+  const finalScale = useTransform([cardScale, hoverScaleMV], ([ss, hs]) => ss * hs)
+
+  const onHoverStart = () => {
+    setHovered(true)
+    animate(hoverScaleMV, 1.02, { duration: 0.15 })
+  }
+  const onHoverEnd = () => {
+    setHovered(false)
+    animate(hoverScaleMV, 1, { duration: 0.15 })
+  }
 
   return (
-    <div
-      onClick={onClick}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      style={{
-        height: '380px',
-        border: `1px solid ${hovered ? '#1a1814' : '#e8e3db'}`,
-        cursor: 'pointer',
-        transition: 'border-color 0.2s ease',
-        display: 'flex',
-        flexDirection: 'column',
-        borderRadius: 0,
-        overflow: 'hidden',
-      }}
+    // Outer: entry animation only
+    <motion.div
+      initial={{ opacity: 0, x: 60 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.5, ease: 'easeOut', delay: index * 0.08 }}
+      style={{ flexShrink: 0 }}
     >
-      {/* Cover — top 60% */}
-      <div
+      {/* Inner: 3D scroll transforms + hover */}
+      <motion.div
+        onClick={() => onOpen(project)}
+        onHoverStart={onHoverStart}
+        onHoverEnd={onHoverEnd}
         style={{
-          flex: '0 0 60%',
-          backgroundColor: '#3d2e28',
-          opacity: hovered ? 0.85 : 1,
-          transition: 'opacity 0.2s ease',
-        }}
-      />
-
-      {/* Info — bottom 40% */}
-      <div
-        style={{
-          flex: '0 0 40%',
-          backgroundColor: '#ffffff',
-          padding: '16px',
+          width: `${CARD_W}px`,
+          height: `${CARD_H}px`,
+          transformPerspective: 1200,
+          rotateY: cardRotateY,
+          scale: finalScale,
+          opacity: cardOpacity,
+          cursor: 'pointer',
+          borderWidth: '1px',
+          borderStyle: 'solid',
+          borderColor: hovered ? '#1a1814' : '#e8e3db',
           display: 'flex',
           flexDirection: 'column',
-          gap: '6px',
           overflow: 'hidden',
+          transition: 'border-color 0.2s ease',
         }}
       >
-        {/* Number + type */}
-        <div className="flex items-center justify-between">
-          <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: '11px', color: '#b0a898' }}>
-            {project.num}
-          </span>
-          <span
-            style={{
-              fontFamily: "'DM Sans', sans-serif",
-              fontSize: '10px',
-              textTransform: 'uppercase',
-              letterSpacing: '0.1em',
-              color: '#c9b99a',
-            }}
-          >
-            {project.type}
-          </span>
-        </div>
-
-        {/* Title */}
-        <h3
+        {/* Cover */}
+        <div
           style={{
-            fontFamily: "'Cormorant Garamond', serif",
-            fontSize: '20px',
-            fontWeight: 400,
-            lineHeight: 1.2,
-            color: '#1a1814',
-            margin: 0,
+            flex: '0 0 60%',
+            backgroundColor: '#2c1f14',
+            opacity: hovered ? 0.85 : 1,
+            transition: 'opacity 0.2s ease',
           }}
-        >
-          {project.title}
-        </h3>
+        />
 
-        {/* One-liner — single line, truncated */}
-        <p
+        {/* Info */}
+        <div
           style={{
-            fontFamily: "'DM Sans', sans-serif",
-            fontSize: '12px',
-            color: '#888',
-            lineHeight: 1.4,
-            margin: 0,
+            flex: '0 0 40%',
+            backgroundColor: '#ffffff',
+            padding: '20px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '6px',
             overflow: 'hidden',
-            whiteSpace: 'nowrap',
-            textOverflow: 'ellipsis',
           }}
         >
-          {project.oneliner}
-        </p>
-      </div>
-    </div>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: '11px', color: '#b0a898' }}>
+              {project.num}
+            </span>
+            <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#c9b99a' }}>
+              {project.type}
+            </span>
+          </div>
+          <h3 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '20px', fontWeight: 400, lineHeight: 1.2, color: '#1a1814', margin: 0 }}>
+            {project.title}
+          </h3>
+          <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: '12px', color: '#888', lineHeight: 1.4, margin: 0, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
+            {project.oneliner}
+          </p>
+        </div>
+      </motion.div>
+    </motion.div>
   )
 }
 
+// ── ProjectModal ─────────────────────────────────────────────────────────────
+
 function ProjectModal({ project, onClose }) {
+  useEffect(() => {
+    const onKey = (e) => { if (e.key === 'Escape') onClose() }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [onClose])
+
   return (
     <AnimatePresence>
       {project && (
-        <>
-          {/* Backdrop */}
-          <motion.div
-            key="backdrop"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.25 }}
+        <motion.div
+          key="modal"
+          initial={{ opacity: 0, scale: 0.97 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.97 }}
+          transition={{ duration: 0.3, ease: 'easeOut' }}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 50,
+            backgroundColor: '#f0ebe0',
+            overflowY: 'auto',
+          }}
+        >
+          {/* Close button */}
+          <button
             onClick={onClose}
             style={{
               position: 'fixed',
-              inset: 0,
-              backgroundColor: 'rgba(26,24,20,0.45)',
-              zIndex: 40,
-            }}
-          />
-
-          {/* Modal panel */}
-          <motion.div
-            key="modal"
-            initial={{ opacity: 0, scale: 0.96, y: 16 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.96, y: 16 }}
-            transition={{ duration: 0.3, ease: 'easeOut' }}
-            style={{
-              position: 'fixed',
-              inset: '5%',
-              backgroundColor: '#faf8f5',
-              zIndex: 50,
-              overflowY: 'auto',
-              padding: '48px 56px',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '24px',
+              top: '24px',
+              right: '32px',
+              background: 'none',
+              border: 'none',
+              fontFamily: "'DM Sans', sans-serif",
+              fontSize: '11px',
+              textTransform: 'uppercase',
+              letterSpacing: '0.12em',
+              color: '#1a1814',
+              cursor: 'pointer',
+              padding: '8px',
+              zIndex: 51,
             }}
           >
-            {/* Close */}
-            <button
-              onClick={onClose}
+            CLOSE ×
+          </button>
+
+          {/* Two-column layout */}
+          <div
+            style={{
+              display: 'flex',
+              minHeight: '100vh',
+              padding: 'clamp(32px, 5vw, 60px)',
+              gap: '60px',
+            }}
+          >
+            {/* Left column — 45% */}
+            <div
               style={{
-                position: 'absolute',
-                top: '24px',
-                right: '32px',
-                background: 'none',
-                border: 'none',
-                fontSize: '24px',
-                color: '#1a1814',
-                cursor: 'pointer',
-                lineHeight: 1,
-                fontFamily: "'DM Sans', sans-serif",
+                flex: '0 0 45%',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '24px',
+                paddingTop: '20px',
               }}
             >
-              ×
-            </button>
+              {/* Num + type */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: '12px', color: '#b0a898' }}>
+                  {project.num}
+                </span>
+                <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.12em', color: '#c9b99a' }}>
+                  {project.type}
+                </span>
+              </div>
 
-            {/* Number + type */}
-            <div className="flex items-center gap-4">
-              <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: '12px', color: '#b0a898' }}>
-                {project.num}
-              </span>
-              <span
+              {/* Title */}
+              <h2
                 style={{
-                  fontFamily: "'DM Sans', sans-serif",
-                  fontSize: '11px',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.12em',
-                  color: '#c9b99a',
+                  fontFamily: "'Cormorant Garamond', serif",
+                  fontSize: '52px',
+                  fontWeight: 400,
+                  lineHeight: 1.05,
+                  color: '#1a1814',
+                  margin: 0,
                 }}
               >
-                {project.type}
-              </span>
-            </div>
+                {project.title}
+              </h2>
 
-            {/* Title */}
-            <h2
-              style={{
-                fontFamily: "'Cormorant Garamond', serif",
-                fontSize: 'clamp(36px, 5vw, 60px)',
-                fontWeight: 400,
-                lineHeight: 1.05,
-                color: '#1a1814',
-              }}
-            >
-              {project.title}
-            </h2>
+              <div style={{ borderTop: '1px solid #d4ccc0' }} />
 
-            <div style={{ borderTop: '1px solid #d4ccc0' }} />
-
-            {/* Description */}
-            <p
-              style={{
-                fontFamily: "'DM Sans', sans-serif",
-                fontSize: '15px',
-                lineHeight: 1.8,
-                color: '#444',
-                maxWidth: '60ch',
-              }}
-            >
-              {project.description}
-            </p>
-
-            {/* Tools */}
-            <div>
-              <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.12em', color: '#b0a898', marginBottom: '10px' }}>
-                Tools
+              {/* Description */}
+              <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: '15px', color: '#555', lineHeight: 1.75, margin: 0 }}>
+                {project.description}
               </p>
-              <div className="flex flex-wrap gap-2">
-                {project.tools.map(t => <ToolPill key={t} label={t} />)}
-              </div>
-            </div>
 
-            {/* Links */}
-            {project.links.length > 0 && (
+              {/* Built with */}
               <div>
-                <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.12em', color: '#b0a898', marginBottom: '10px' }}>
-                  Links
+                <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: '9px', textTransform: 'uppercase', letterSpacing: '0.16em', color: '#c9b99a', margin: '0 0 8px' }}>
+                  Built With
                 </p>
-                <div className="flex flex-col gap-2">
+                <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: '13px', color: '#555', margin: 0, lineHeight: 1.6 }}>
+                  {project.tools.join(', ')}
+                </p>
+              </div>
+
+              {/* Links */}
+              {project.links?.length > 0 && (
+                <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
                   {project.links.map(link => (
                     <a
                       key={link.label}
                       href={link.href}
                       target="_blank"
                       rel="noreferrer"
-                      style={{
-                        fontFamily: "'DM Sans', sans-serif",
-                        fontSize: '14px',
-                        color: '#1a1814',
-                        textDecoration: 'none',
-                      }}
+                      style={{ fontFamily: "'DM Sans', sans-serif", fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#1a1814', textDecoration: 'none' }}
                       onMouseEnter={e => { e.currentTarget.style.textDecoration = 'underline' }}
                       onMouseLeave={e => { e.currentTarget.style.textDecoration = 'none' }}
                     >
@@ -307,60 +285,199 @@ function ProjectModal({ project, onClose }) {
                     </a>
                   ))}
                 </div>
-              </div>
-            )}
-          </motion.div>
-        </>
+              )}
+            </div>
+
+            {/* Right column — 55%, dark visual anchor */}
+            <div
+              style={{
+                flex: '0 0 55%',
+                backgroundColor: '#2c1f14',
+                borderRadius: '2px',
+                minHeight: '100%',
+              }}
+            />
+          </div>
+        </motion.div>
       )}
     </AnimatePresence>
   )
 }
 
+// ── Work ─────────────────────────────────────────────────────────────────────
+
 export default function Work() {
-  const [active, setActive] = useState(null)
+  const [active, setActive]   = useState(null)
+  const trackRef              = useRef(null)
+  const containerRef          = useRef(null)
+  const scrollX               = useMotionValue(0)
+  const containerWidthMV      = useMotionValue(1200)
+  const trackPaddingMV        = useMotionValue(80)
+  const isDragging            = useRef(false)
+  const hasDragged            = useRef(false)
+  const dragStartX            = useRef(0)
+  const dragStartScroll       = useRef(0)
+
+  // Measure container and track padding on mount + resize
+  useEffect(() => {
+    const measure = () => {
+      if (containerRef.current) containerWidthMV.set(containerRef.current.offsetWidth)
+      if (trackRef.current) {
+        const pl = parseFloat(window.getComputedStyle(trackRef.current).paddingLeft) || 80
+        trackPaddingMV.set(pl)
+      }
+    }
+    measure()
+    window.addEventListener('resize', measure)
+    return () => window.removeEventListener('resize', measure)
+  }, [])
+
+  // Convert vertical wheel to horizontal scroll
+  useEffect(() => {
+    const track = trackRef.current
+    if (!track) return
+    const onWheel = (e) => {
+      e.preventDefault()
+      track.scrollLeft += e.deltaY + e.deltaX
+    }
+    track.addEventListener('wheel', onWheel, { passive: false })
+    return () => track.removeEventListener('wheel', onWheel)
+  }, [])
+
+  // Global pointer move/up for drag (works even if pointer leaves track)
+  useEffect(() => {
+    const onMove = (e) => {
+      if (!isDragging.current) return
+      const dx = e.clientX - dragStartX.current
+      if (Math.abs(dx) > 5) hasDragged.current = true
+      if (trackRef.current) trackRef.current.scrollLeft = dragStartScroll.current - dx
+    }
+    const onUp = () => {
+      if (!isDragging.current) return
+      isDragging.current = false
+      document.body.style.cursor = ''
+      requestAnimationFrame(() => { hasDragged.current = false })
+    }
+    window.addEventListener('pointermove', onMove)
+    window.addEventListener('pointerup', onUp)
+    return () => {
+      window.removeEventListener('pointermove', onMove)
+      window.removeEventListener('pointerup', onUp)
+    }
+  }, [])
+
+  const handleScroll = () => scrollX.set(trackRef.current?.scrollLeft ?? 0)
+
+  const handlePointerDown = (e) => {
+    if (e.button !== 0) return
+    isDragging.current = true
+    hasDragged.current = false
+    dragStartX.current = e.clientX
+    dragStartScroll.current = trackRef.current?.scrollLeft ?? 0
+    document.body.style.cursor = 'grabbing'
+  }
+
+  const handleCardOpen = (proj) => {
+    if (hasDragged.current) return
+    setActive(proj)
+  }
+
+  // Progress bar: scaleX 0→1
+  const totalScroll = Math.max(1, projects.length * CARD_TOTAL - containerWidthMV.get() + trackPaddingMV.get() * 2)
+  const progressScaleX = useTransform(scrollX, [0, totalScroll], [0, 1])
 
   return (
-    <section id="work" style={{ backgroundColor: '#faf8f5' }}>
+    <section id="work" style={{ backgroundColor: '#f0ebe0', position: 'relative', overflow: 'hidden' }}>
+      <style>{`#work .projects-track::-webkit-scrollbar { display: none; }`}</style>
+
+      {/* Ghost number */}
+      <div style={{
+        position: 'absolute',
+        top: '-20px',
+        left: '-10px',
+        fontFamily: "'Oswald', sans-serif",
+        fontSize: '280px',
+        fontWeight: 700,
+        color: 'rgba(26,24,20,0.06)',
+        lineHeight: 1,
+        pointerEvents: 'none',
+        userSelect: 'none',
+        letterSpacing: '-0.02em',
+        zIndex: 0,
+      }}>01</div>
 
       {/* Section header */}
-      <div className="px-8 md:px-14 lg:px-20 pt-20 pb-0">
-        <div className="flex items-baseline gap-5 pb-4">
-          <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: '12px', color: '#b0a898' }}>01</span>
-          <h2
-            style={{
-              fontFamily: "'Bebas Neue', sans-serif",
-              fontSize: 'clamp(48px, 7vw, 80px)',
-              letterSpacing: '0.04em',
-              lineHeight: 1,
-              color: '#1a1814',
-            }}
-          >
-            Projects
-          </h2>
+      <div className="px-8 md:px-14 lg:px-20" style={{ position: 'relative', zIndex: 1 }}>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: '16px', paddingTop: '120px', marginBottom: '48px' }}>
+          <span style={{
+            fontFamily: "'DM Sans', sans-serif",
+            fontSize: '11px',
+            letterSpacing: '0.14em',
+            textTransform: 'uppercase',
+            color: '#b5935a',
+          }}>01</span>
+          <h2 style={{
+            fontFamily: "'Oswald', sans-serif",
+            fontWeight: 700,
+            fontSize: 'clamp(48px, 7vw, 80px)',
+            letterSpacing: '0.02em',
+            lineHeight: 1,
+            color: '#1a1814',
+            margin: 0,
+          }}>PROJECTS</h2>
         </div>
-        <div style={{ borderTop: '1px solid #d4ccc0' }} />
       </div>
 
-      {/* Grid */}
-      <div
-        className="px-8 md:px-14 lg:px-20 py-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
-      >
-        {projects.map((p, i) => (
-          <motion.div
-            key={p.num}
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-60px' }}
-            transition={{ duration: 0.5, ease: 'easeOut', delay: i * 0.07 }}
-          >
-            <ProjectCard project={p} onClick={() => setActive(p)} />
-          </motion.div>
-        ))}
+      {/* Track */}
+      <div ref={containerRef}>
+        <div
+          ref={trackRef}
+          className="projects-track px-8 md:px-14 lg:px-20"
+          onScroll={handleScroll}
+          onPointerDown={handlePointerDown}
+          style={{
+            display: 'flex',
+            gap: `${CARD_GAP}px`,
+            overflowX: 'scroll',
+            overflowY: 'hidden',
+            height: `${TRACK_H}px`,
+            alignItems: 'center',
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none',
+            cursor: 'grab',
+            userSelect: 'none',
+          }}
+        >
+          {projects.map((p, i) => (
+            <ProjectCard
+              key={p.num}
+              project={p}
+              index={i}
+              scrollX={scrollX}
+              containerWidthMV={containerWidthMV}
+              trackPaddingMV={trackPaddingMV}
+              onOpen={handleCardOpen}
+            />
+          ))}
+        </div>
+
+        {/* Progress bar */}
+        <div className="px-8 md:px-14 lg:px-20" style={{ paddingTop: '12px', paddingBottom: '100px' }}>
+          <div style={{ height: '1px', backgroundColor: '#e8e3db', overflow: 'hidden' }}>
+            <motion.div
+              style={{
+                height: '100%',
+                width: '100%',
+                backgroundColor: '#c9b99a',
+                scaleX: progressScaleX,
+                originX: 0,
+              }}
+            />
+          </div>
+        </div>
       </div>
 
-      {/* Modal */}
       <ProjectModal project={active} onClose={() => setActive(null)} />
-
     </section>
   )
 }
