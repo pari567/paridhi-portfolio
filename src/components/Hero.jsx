@@ -8,7 +8,6 @@ function PolaroidCard() {
   const isDragging = useRef(false)
   const startX = useRef(0)
 
-  // Entry: 6deg → 3deg, scale 0.9 → 1, opacity 0 → 1, 0.8s easeOut, then still
   useEffect(() => {
     rawRotation.set(6)
     const entry = animate(rawRotation, 3, { duration: 0.8, ease: 'easeOut' })
@@ -36,28 +35,13 @@ function PolaroidCard() {
   }
 
   return (
-    <div
-      style={{
-        width: '380px',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        userSelect: 'none',
-      }}
-    >
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', userSelect: 'none' }}>
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.8, ease: 'easeOut' }}
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          rotate: rotation,
-          transformOrigin: 'top center',
-        }}
+        style={{ rotate: rotation, transformOrigin: 'top center' }}
       >
-        {/* Polaroid card — position relative to contain the pin */}
         <motion.div
           whileHover={{ scale: 1.02 }}
           onPointerDown={onPointerDown}
@@ -67,7 +51,7 @@ function PolaroidCard() {
             position: 'relative',
             width: '340px',
             backgroundColor: '#ffffff',
-            padding: '12px 12px 40px 12px',
+            padding: '12px 12px 16px 12px',
             boxShadow: '0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.08)',
             borderRadius: '2px',
             cursor: 'grab',
@@ -89,7 +73,6 @@ function PolaroidCard() {
               zIndex: 2,
             }}
           />
-
           <img
             src="/photo.jpg"
             alt="Paridhi Bansal"
@@ -103,47 +86,20 @@ function PolaroidCard() {
               filter: 'contrast(1.05) saturate(1.15) brightness(1.05)',
             }}
           />
-          <p
-            style={{
-              fontFamily: "'Cormorant Garamond', serif",
-              fontStyle: 'italic',
-              fontSize: '14px',
-              color: '#1a1814',
-              textAlign: 'center',
-              margin: '8px 0 3px',
-            }}
-          >
-            Paridhi Bansal
-          </p>
-          <p
-            style={{
-              fontFamily: "'DM Sans', sans-serif",
-              fontSize: '9px',
-              textTransform: 'uppercase',
-              letterSpacing: '0.1em',
-              color: '#c9b99a',
-              textAlign: 'center',
-              margin: 0,
-            }}
-          >
-            Psychology × Data Science
-          </p>
         </motion.div>
       </motion.div>
 
-      {/* Label */}
-      <p
+      {/* Drag hint — symbol only */}
+      <span
         style={{
-          fontFamily: "'DM Sans', sans-serif",
-          fontSize: '9px',
-          textTransform: 'uppercase',
-          letterSpacing: '0.12em',
-          color: '#b0a898',
-          marginTop: '14px',
+          fontSize: '10px',
+          color: '#c9b99a',
+          marginTop: '10px',
+          userSelect: 'none',
         }}
       >
-        ↔ drag me
-      </p>
+        ↔
+      </span>
     </div>
   )
 }
@@ -161,45 +117,62 @@ export default function Hero() {
       style={{ backgroundColor: '#faf8f5', paddingTop: '40px' }}
       className="flex flex-col"
     >
-      {/* Body — two columns */}
-      <div
-        className="flex-1 flex"
-        style={{ borderBottom: '1px solid #d4ccc0', gap: '40px' }}
+      {/* ── Name bar ── */}
+      <motion.div
+        {...fade(0.1)}
+        style={{ borderTop: '1px solid #e8e3db', borderBottom: '1px solid #e8e3db' }}
       >
-        {/* Left column */}
-        <div className="flex-1 flex flex-col gap-6 px-8 md:px-14 lg:px-20 py-10">
+        <div
+          className="px-8 md:px-14 lg:px-20"
+          style={{ display: 'flex', alignItems: 'center', gap: '24px' }}
+        >
+          <span
+            style={{
+              fontFamily: "'DM Sans', sans-serif",
+              fontSize: '11px',
+              color: '#b0a898',
+              flexShrink: 0,
+              lineHeight: 1,
+            }}
+          >
+            00
+          </span>
+          <h1
+            style={{
+              fontFamily: "'Bebas Neue', sans-serif",
+              fontSize: 'clamp(72px, 10vw, 140px)',
+              letterSpacing: '0.02em',
+              lineHeight: 0.92,
+              color: '#1a1814',
+              margin: 0,
+              flex: 1,
+            }}
+          >
+            PARIDHI BANSAL
+          </h1>
+        </div>
+      </motion.div>
 
-          {/* Name — mixed typeface treatment */}
-          <motion.div {...fade(0.1)}>
-            <h1 style={{ margin: 0, lineHeight: 1 }}>
-              <span
-                style={{
-                  fontFamily: "'Bebas Neue', sans-serif",
-                  fontSize: 'clamp(56px, 8vw, 110px)',
-                  fontWeight: 400,
-                  color: '#1a1814',
-                  letterSpacing: '0.02em',
-                  display: 'block',
-                }}
-              >
-                PARIDHI
-              </span>
-              <span
-                style={{
-                  fontFamily: "'Cormorant Garamond', serif",
-                  fontSize: 'clamp(52px, 7.5vw, 104px)',
-                  fontWeight: 400,
-                  fontStyle: 'italic',
-                  color: '#1a1814',
-                  display: 'block',
-                  marginTop: '-12px',
-                }}
-              >
-                Bansal
-              </span>
-            </h1>
-          </motion.div>
-
+      {/* ── Two-column content ── */}
+      <div
+        className="px-8 md:px-14 lg:px-20 py-12"
+        style={{
+          display: 'flex',
+          gap: '60px',
+          alignItems: 'flex-start',
+          borderBottom: '1px solid #d4ccc0',
+        }}
+      >
+        {/* Left column — 55% */}
+        <div
+          style={{
+            flex: '1 1 55%',
+            minWidth: 0,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '24px',
+          }}
+        >
           {/* Tagline */}
           <motion.p
             {...fade(0.3)}
@@ -208,6 +181,7 @@ export default function Hero() {
               fontSize: 'clamp(18px, 2.5vw, 26px)',
               letterSpacing: '0.12em',
               color: '#c9b99a',
+              margin: 0,
             }}
           >
             PSYCHOLOGY × DATA SCIENCE
@@ -216,20 +190,26 @@ export default function Hero() {
           {/* Roles */}
           <motion.p
             {...fade(0.38)}
-            className="text-xs uppercase tracking-widest"
-            style={{ color: '#888', fontFamily: "'DM Sans', sans-serif", letterSpacing: '0.15em' }}
+            style={{
+              fontFamily: "'DM Sans', sans-serif",
+              fontSize: '11px',
+              textTransform: 'uppercase',
+              letterSpacing: '0.15em',
+              color: '#888',
+              margin: 0,
+            }}
           >
             UX Research · Consumer Insights · People &amp; Culture · Program Coordination
           </motion.p>
 
           {/* Links */}
-          <motion.div {...fade(0.46)} className="flex items-center">
+          <motion.div {...fade(0.46)} style={{ display: 'flex', alignItems: 'center' }}>
             {[
               { label: 'Resume ↗', href: 'https://drive.google.com/file/d/1sZZIhCh4s3RCRS8mvQjY3WGeivfomqu2/view?usp=sharing' },
               { label: 'LinkedIn ↗', href: 'https://www.linkedin.com/in/paridhibansal' },
               { label: 'GitHub ↗', href: 'https://github.com/pari567' },
             ].map(({ label, href }, i) => (
-              <div key={i} className="flex items-center">
+              <div key={i} style={{ display: 'flex', alignItems: 'center' }}>
                 {i > 0 && (
                   <span style={{ width: '1px', height: '12px', backgroundColor: '#c9b99a', display: 'inline-block', margin: '0 24px' }} />
                 )}
@@ -262,7 +242,7 @@ export default function Hero() {
               fontSize: '15px',
               lineHeight: 1.75,
               color: '#444',
-              maxWidth: '42ch',
+              margin: 0,
             }}
           >
             I have a BA in Psychology and Data Science from UBC, two fields that don't always talk
@@ -281,8 +261,7 @@ export default function Hero() {
               fontSize: '14px',
               fontStyle: 'italic',
               color: '#888',
-              marginTop: '16px',
-              maxWidth: '42ch',
+              margin: 0,
               lineHeight: 1.65,
             }}
           >
@@ -290,7 +269,7 @@ export default function Hero() {
           </motion.p>
 
           {/* Education */}
-          <motion.div {...fade(0.65)} style={{ marginTop: '12px' }}>
+          <motion.div {...fade(0.65)}>
             <p style={{
               fontFamily: "'DM Sans', sans-serif",
               fontSize: '9px',
@@ -298,6 +277,7 @@ export default function Hero() {
               letterSpacing: '0.16em',
               color: '#c9b99a',
               marginBottom: '4px',
+              marginTop: 0,
             }}>
               Education
             </p>
@@ -305,21 +285,17 @@ export default function Hero() {
               fontFamily: "'DM Sans', sans-serif",
               fontSize: '13px',
               color: '#444',
+              margin: 0,
             }}>
               BA, Psychology + Data Science · University of British Columbia · 2026
             </p>
           </motion.div>
-
         </div>
 
-        {/* Right column — polaroid aligned to top of name */}
-        <motion.div
-          {...fade(0.35)}
-          className="hidden md:flex items-start justify-center py-10"
-          style={{ width: '42%', flexShrink: 0, paddingRight: '40px', marginTop: '-40px' }}
-        >
+        {/* Right column — 45%, polaroid at top */}
+        <div style={{ flex: '1 1 45%', minWidth: 0 }}>
           <PolaroidCard />
-        </motion.div>
+        </div>
       </div>
 
     </section>
