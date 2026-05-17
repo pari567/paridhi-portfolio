@@ -14,7 +14,7 @@ const projects = [
   },
   {
     num: '02',
-    type: 'Research',
+    type: 'Academic · Research',
     title: 'Heartstrings & Headlines',
     oneliner: 'Does aesthetic design make people care more about news?',
     description:
@@ -24,7 +24,7 @@ const projects = [
   },
   {
     num: '03',
-    type: 'Data Science',
+    type: 'Academic · Data Science',
     title: 'Online Shoppers Classification',
     oneliner: 'Predicting purchase intent from browsing behaviour using machine learning',
     description:
@@ -34,7 +34,7 @@ const projects = [
   },
   {
     num: '04',
-    type: 'Data Science',
+    type: 'Academic · Data Science',
     title: 'Bank Marketing Dashboard',
     oneliner: 'Interactive dashboards uncovering what predicts term deposit subscriptions',
     description:
@@ -96,7 +96,7 @@ function ProjectCard({ project, onClick }) {
       <div
         style={{
           flex: '0 0 60%',
-          backgroundColor: '#2c2420',
+          backgroundColor: '#3d2e28',
           opacity: hovered ? 0.85 : 1,
           transition: 'opacity 0.2s ease',
         }}
@@ -335,7 +335,7 @@ export default function Work() {
               color: '#1a1814',
             }}
           >
-            Work
+            Projects
           </h2>
         </div>
         <div style={{ borderTop: '1px solid #d4ccc0' }} />

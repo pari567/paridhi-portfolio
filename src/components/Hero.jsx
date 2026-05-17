@@ -118,25 +118,8 @@ export default function Hero() {
       className="flex flex-col"
     >
       {/* ── Name bar ── */}
-      <motion.div
-        {...fade(0.1)}
-        style={{ borderTop: '1px solid #e8e3db', borderBottom: '1px solid #e8e3db' }}
-      >
-        <div
-          className="px-8 md:px-14 lg:px-20"
-          style={{ display: 'flex', alignItems: 'center', gap: '24px' }}
-        >
-          <span
-            style={{
-              fontFamily: "'DM Sans', sans-serif",
-              fontSize: '11px',
-              color: '#b0a898',
-              flexShrink: 0,
-              lineHeight: 1,
-            }}
-          >
-            00
-          </span>
+      <motion.div {...fade(0.1)}>
+        <div className="px-8 md:px-14 lg:px-20">
           <h1
             style={{
               fontFamily: "'Bebas Neue', sans-serif",
