@@ -1,76 +1,23 @@
 import { motion } from 'framer-motion'
 
-const groups = [
+const rows = [
   {
     label: 'Research & Analysis',
-    skills: [
-      'SPSS', 'R', 'Python', 'Qualtrics', 'Excel',
-      'Research design', 'Qualitative & quantitative methods',
-      'Survey design', 'Experimental protocol',
-    ],
+    skills: 'SPSS, R, Python, Qualtrics, Excel, Research design, Qualitative & quantitative methods, Survey design, Experimental protocol',
   },
   {
     label: 'Communication & Writing',
-    skills: [
-      'Knowledge translation', 'Stakeholder communication',
-      'Content strategy', 'Report writing',
-      'Public-facing communication', 'Copywriting', 'Editorial leadership',
-    ],
+    skills: 'Knowledge translation, Stakeholder communication, Content strategy, Report writing, Public-facing communication, Copywriting, Editorial leadership',
   },
   {
     label: 'Creative & Build',
-    skills: [
-      'React', 'Vite', 'Tailwind CSS', 'Framer Motion', 'Vibe coding',
-      'Canva', 'Notion', 'Miro', 'Google Suite', 'Eventbrite',
-    ],
+    skills: 'React, Vite, Tailwind CSS, Framer Motion, Vibe coding, Canva, Notion, Miro, Google Suite, Eventbrite',
   },
   {
     label: 'Collaboration & Leadership',
-    skills: [
-      'Team leadership', 'Cross-functional collaboration',
-      'Workshop facilitation', 'Project coordination', 'Participant management',
-    ],
+    skills: 'Team leadership, Cross-functional collaboration, Workshop facilitation, Project coordination, Participant management',
   },
 ]
-
-function SkillGroup({ group, index }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-40px' }}
-      transition={{ duration: 0.45, ease: 'easeOut', delay: index * 0.07 }}
-    >
-      <p
-        style={{
-          fontFamily: "'DM Sans', sans-serif",
-          fontSize: '10px',
-          textTransform: 'uppercase',
-          letterSpacing: '0.16em',
-          color: '#c9b99a',
-          marginBottom: '10px',
-        }}
-      >
-        {group.label}
-      </p>
-      <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-        {group.skills.map(skill => (
-          <li
-            key={skill}
-            style={{
-              fontFamily: "'DM Sans', sans-serif",
-              fontSize: '15px',
-              color: '#444',
-              lineHeight: 2.0,
-            }}
-          >
-            {skill}
-          </li>
-        ))}
-      </ul>
-    </motion.div>
-  )
-}
 
 export default function Skills() {
   return (
@@ -95,14 +42,60 @@ export default function Skills() {
         <div style={{ borderTop: '1px solid #d4ccc0' }} />
       </div>
 
-      {/* Two-column grid */}
-      <div
-        className="px-8 md:px-14 lg:px-20 py-12 grid grid-cols-1 md:grid-cols-2 gap-x-16"
-        style={{ rowGap: '48px' }}
-      >
-        {groups.map((group, i) => (
-          <SkillGroup key={group.label} group={group} index={i} />
+      {/* Rows */}
+      <div className="px-8 md:px-14 lg:px-20 pb-12">
+        {rows.map((row, i) => (
+          <motion.div
+            key={row.label}
+            initial={{ opacity: 0, y: 12 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-40px' }}
+            transition={{ duration: 0.45, ease: 'easeOut', delay: i * 0.07 }}
+          >
+            <div style={{ borderTop: '1px solid #e8e3db' }} />
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'baseline',
+                gap: '32px',
+                padding: '16px 0',
+              }}
+            >
+              {/* Category label */}
+              <span
+                style={{
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontSize: '9px',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.16em',
+                  color: '#c9b99a',
+                  flexShrink: 0,
+                  width: '200px',
+                  lineHeight: 1.6,
+                }}
+              >
+                {row.label}
+              </span>
+
+              {/* Vertical divider */}
+              <div style={{ width: '1px', alignSelf: 'stretch', backgroundColor: '#e8e3db', flexShrink: 0 }} />
+
+              {/* Skills */}
+              <span
+                style={{
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontSize: '14px',
+                  color: '#444',
+                  lineHeight: 1.6,
+                }}
+              >
+                {row.skills}
+              </span>
+            </div>
+          </motion.div>
         ))}
+        {/* Bottom ruled line */}
+        <div style={{ borderTop: '1px solid #e8e3db' }} />
       </div>
 
     </section>
