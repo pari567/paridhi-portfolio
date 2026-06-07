@@ -393,10 +393,10 @@ export default function Work() {
       {/* Ghost number */}
       <div style={{
         position: 'absolute',
-        top: '-20px',
-        left: '-10px',
+        top: '60px',
+        left: '60px',
         fontFamily: "'Oswald', sans-serif",
-        fontSize: '280px',
+        fontSize: '180px',
         fontWeight: 700,
         color: 'rgba(26,24,20,0.06)',
         lineHeight: 1,
@@ -408,7 +408,7 @@ export default function Work() {
 
       {/* Section header */}
       <div className="px-8 md:px-14 lg:px-20" style={{ position: 'relative', zIndex: 1 }}>
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: '16px', paddingTop: '120px', marginBottom: '48px' }}>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: '16px', paddingTop: '140px', marginBottom: '48px' }}>
           <span style={{
             fontFamily: "'DM Sans', sans-serif",
             fontSize: '11px',
@@ -462,7 +462,7 @@ export default function Work() {
         </div>
 
         {/* Progress bar */}
-        <div className="px-8 md:px-14 lg:px-20" style={{ paddingTop: '12px', paddingBottom: '100px' }}>
+        <div className="px-8 md:px-14 lg:px-20" style={{ paddingTop: '12px', paddingBottom: '140px' }}>
           <div style={{ height: '1px', backgroundColor: '#e8e3db', overflow: 'hidden' }}>
             <motion.div
               style={{

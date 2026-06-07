@@ -5,10 +5,16 @@ body {
   background-color: #f0ebe0;
   color: #1a1814;
   font-family: 'DM Sans', sans-serif;
-  scroll-behavior: smooth;
+}
+
+html {
+  scroll-snap-type: y mandatory;
+  overflow-y: scroll;
+  height: 100%;
 }
 
 body {
+  height: 100%;
   padding-top: 56px;
 }
 

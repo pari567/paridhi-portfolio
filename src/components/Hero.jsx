@@ -146,7 +146,7 @@ export default function Hero() {
             color: '#1a1814',
             letterSpacing: '0.02em',
             display: 'block',
-            marginTop: '-8px',
+            marginTop: '0.15em',
           }}>BANSAL</div>
         </motion.div>
 
